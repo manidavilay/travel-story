@@ -1,16 +1,17 @@
 require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const app = express();
+const authRoutes = require("./routes/auth.route");
 
 const port = process.env.PORT || 8000;
 const DBStringConnection = process.env.MONGODB_URI;
 
 app.use(express.json());
 app.use(cors());
+app.use("/api/auth", authRoutes);
 
 app.get("/", async (req, res) => {
   res.send("This is from node");
