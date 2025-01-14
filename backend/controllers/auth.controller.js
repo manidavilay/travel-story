@@ -39,4 +39,35 @@ const registerUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser };
+// Login User API
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    if (!email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+    const existingUser = await User.findOne({ email });
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const isPasswordValid = bcrypt.compare(password, existingUser.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    const accessToken = jwt.sign(
+      { userId: existingUser._id },
+      process.env.ACCESS_TOKEN,
+      { expiresIn: "1h" }
+    );
+    return res.status(200).json({
+      message: "Login successful !",
+      user: { fullName: existingUser.fullName, email: existingUser.email },
+      accessToken,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error. Please try again" });
+  }
+};
+
+module.exports = { registerUser, loginUser };
