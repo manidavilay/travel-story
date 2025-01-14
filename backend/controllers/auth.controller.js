@@ -26,7 +26,7 @@ const registerUser = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: newUser._id },
       process.env.ACCESS_TOKEN,
-      { expiresIn: "1h" }
+      { expiresIn: "72h" }
     );
     return res.status(201).json({
       fullName: newUser.fullName,

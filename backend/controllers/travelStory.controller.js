@@ -42,4 +42,40 @@ const getAllStories = async (req, res) => {
   }
 };
 
-module.exports = { addTravelStory, getAllStories };
+// Edit Travel Story API
+const editTravelStory = async (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.user;
+  const { title, story, visitedLocation, imageUrl, visitedDate } = req.body;
+  try {
+    if (!title || !story || !visitedLocation || !imageUrl || !visitedDate) {
+      res.status(400).json({ message: "All fields are required" });
+    }
+
+    const existingTravelStory = await TravelStory.findOne({
+      _id: id,
+      userId: userId,
+    });
+    if (!existingTravelStory) {
+      return res.status(404).json({ message: "Travel story not found" });
+    }
+
+    const parsedVisitedDate = new Date(parseInt(visitedDate));
+    const placeholderImageUrl = `http://localhost:8000/assets/placeholder.png`;
+
+    existingTravelStory.title = title;
+    existingTravelStory.story = story;
+    existingTravelStory.visitedLocation = visitedLocation;
+    existingTravelStory.imageUrl = imageUrl || placeholderImageUrl;
+    existingTravelStory.visitedDate = parsedVisitedDate;
+
+    await existingTravelStory.save();
+    return res
+      .status(200)
+      .json({ message: "Travel story successfully updated !" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error. Please try again" });
+  }
+};
+
+module.exports = { addTravelStory, getAllStories, editTravelStory };
