@@ -70,4 +70,21 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+// Get User API
+const getUser = async (req, res) => {
+  const { userId } = req.user;
+  try {
+    const existingUser = await User.findOne({ _id: userId });
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res
+      .status(200)
+      .json({ user: existingUser, message: "User successfully found !" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error. Please try again" });
+  }
+};
+
+module.exports = { registerUser, loginUser, getUser };
