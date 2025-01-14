@@ -29,4 +29,17 @@ const addTravelStory = async (req, res) => {
   }
 };
 
-module.exports = { addTravelStory };
+// Get All Travel Stories API
+const getAllStories = async (req, res) => {
+  const { userId } = req.user;
+  try {
+    const travelStories = await TravelStory.find({ userId: userId }).sort({
+      isFavorite: -1,
+    });
+    res.status(200).json({ stories: travelStories });
+  } catch (error) {
+    res.status(500).json({ message: "Server error. Please try again" });
+  }
+};
+
+module.exports = { addTravelStory, getAllStories };
