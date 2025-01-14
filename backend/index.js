@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 
 const app = express();
 const port = process.env.PORT || 8000;
+const DBStringConnection = process.env.MONGODB_URI;
 
 app.use(express.json());
 
@@ -14,5 +15,10 @@ app.get("/", async (req, res) => {
 app.listen(port, () => {
   console.log(`App is running on port ${port}`);
 });
+
+mongoose
+  .connect(DBStringConnection)
+  .then(() => console.log("Successfully connected to database"))
+  .catch(() => console.log("Failed to connect"));
 
 module.exports = app;
