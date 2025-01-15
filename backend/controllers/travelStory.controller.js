@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const TravelStory = require("../models/travelStory.model");
 
 // Add Travel Story API
@@ -78,4 +80,44 @@ const editTravelStory = async (req, res) => {
   }
 };
 
-module.exports = { addTravelStory, getAllStories, editTravelStory };
+// Delete Travel Story API
+const deleteTravelStory = async (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.user;
+  try {
+    const existingTravelStory = await TravelStory.findOne({
+      _id: id,
+      userId: userId,
+    });
+    if (!existingTravelStory) {
+      return res.status(404).json({ message: "Travel story not found" });
+    }
+
+    await existingTravelStory.deleteOne();
+
+    const imageUrl = existingTravelStory.imageUrl;
+    const filename = path.basename(imageUrl);
+    const filePath = path.join(__dirname, "..", "uploads", filename);
+
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        console.error("Error deleting file:", err.message);
+        return;
+      }
+      console.log("Image file deleted successfully.");
+    });
+
+    return res
+      .status(200)
+      .json({ message: "Travel story successfully deleted !" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error. Please try again" });
+  }
+};
+
+module.exports = {
+  addTravelStory,
+  getAllStories,
+  editTravelStory,
+  deleteTravelStory,
+};
