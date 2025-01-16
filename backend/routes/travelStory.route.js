@@ -7,6 +7,7 @@ const {
   editTravelStory,
   deleteTravelStory,
   updateFavoriteTravelStory,
+  searchTravelStories,
 } = require("../controllers/travelStory.controller");
 
 // Add Travel Story Route
@@ -27,5 +28,8 @@ router.put(
   authenticateToken,
   updateFavoriteTravelStory
 );
+
+// Travel Story Search Route
+router.post("/search", authenticateToken, searchTravelStories);
 
 module.exports = router;

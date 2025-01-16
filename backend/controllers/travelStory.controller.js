@@ -135,8 +135,40 @@ const updateFavoriteTravelStory = async (req, res) => {
 
     await existingTravelStory.save();
     res.status(200).json({
-      story: existingTravelStory,
+      existingTravelStory,
       message: "Travel story successfully updated !",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error. Please try again" });
+  }
+};
+
+// Search Travel Stories API
+const searchTravelStories = async (req, res) => {
+  const { query } = req.query;
+  const { userId } = req.user;
+
+  if (!query) {
+    return res.status(400).json({ message: "Query is required" });
+  }
+
+  try {
+    const searchedTravels = await TravelStory.find({
+      userId: userId,
+      $or: [
+        { title: { $regex: query, $options: "i" } },
+        { story: { $regex: query, $options: "i" } },
+        { visitedLocation: { $regex: query, $options: "i" } },
+      ],
+    }).sort({ isFavorite: -1 });
+
+    if (searchedTravels.length === 0) {
+      return res.status(404).json({ message: "No travel stories found" });
+    }
+
+    res.status(200).json({
+      searchedTravels,
+      message: "Travel stories successfully found !",
     });
   } catch (error) {
     res.status(500).json({ message: "Server error. Please try again" });
@@ -149,4 +181,5 @@ module.exports = {
   editTravelStory,
   deleteTravelStory,
   updateFavoriteTravelStory,
+  searchTravelStories,
 };
