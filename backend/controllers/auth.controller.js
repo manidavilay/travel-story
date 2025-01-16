@@ -30,6 +30,7 @@ const registerUser = async (req, res) => {
       process.env.ACCESS_TOKEN,
       { expiresIn: "72h" }
     );
+
     return res.status(201).json({
       fullName: newUser.fullName,
       email: newUser.email,
@@ -65,6 +66,7 @@ const loginUser = async (req, res) => {
       process.env.ACCESS_TOKEN,
       { expiresIn: "72h" }
     );
+
     return res.status(200).json({
       message: "Login successful !",
       user: { fullName: existingUser.fullName, email: existingUser.email },

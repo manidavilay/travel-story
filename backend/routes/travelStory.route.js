@@ -8,6 +8,7 @@ const {
   deleteTravelStory,
   updateFavoriteTravelStory,
   searchTravelStories,
+  filterTravelStoriesByDate,
 } = require("../controllers/travelStory.controller");
 
 // Add Travel Story Route
@@ -31,5 +32,8 @@ router.put(
 
 // Travel Story Search Route
 router.post("/search", authenticateToken, searchTravelStories);
+
+// Filter Travel Story By Date Range
+router.get("/filter-by-date", authenticateToken, filterTravelStoriesByDate);
 
 module.exports = router;

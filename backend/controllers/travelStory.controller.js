@@ -23,6 +23,7 @@ const addTravelStory = async (req, res) => {
     });
 
     await newTravelStory.save();
+
     return res
       .status(201)
       .json({ message: "Travel story successfully created !" });
@@ -38,6 +39,7 @@ const getAllStories = async (req, res) => {
     const travelStories = await TravelStory.find({ userId: userId }).sort({
       isFavorite: -1,
     });
+
     res.status(200).json({ stories: travelStories });
   } catch (error) {
     res.status(500).json({ message: "Server error. Please try again" });
@@ -74,6 +76,7 @@ const editTravelStory = async (req, res) => {
     existingTravelStory.visitedDate = parsedVisitedDate;
 
     await existingTravelStory.save();
+
     return res.status(200).json({
       story: existingTravelStory,
       message: "Travel story successfully updated !",
@@ -138,6 +141,7 @@ const updateFavoriteTravelStory = async (req, res) => {
     existingTravelStory.isFavorite = isFavorite;
 
     await existingTravelStory.save();
+
     res.status(200).json({
       existingTravelStory,
       message: "Travel story successfully updated !",
@@ -179,6 +183,30 @@ const searchTravelStories = async (req, res) => {
   }
 };
 
+// Filter Travel Stories By Date Range API
+const filterTravelStoriesByDate = async (req, res) => {
+  const { userId } = req.user;
+  const { startDate, endDate } = req.query;
+
+  try {
+    const start = new Date(parseInt(startDate));
+    const end = new Date(parseInt(endDate));
+
+    const filteredStories = await TravelStory.find({
+      userId: userId,
+      visitedDate: { $gte: start, $lte: end },
+    }).sort({ isFavorite: -1 });
+
+    if (filteredStories.length === 0) {
+      return res.status(404).json({ message: "No travel stories found" });
+    }
+
+    res.status(200).json({ filteredStories });
+  } catch (error) {
+    res.status(500).json({ message: "Server error. Please try again" });
+  }
+};
+
 module.exports = {
   addTravelStory,
   getAllStories,
@@ -186,4 +214,5 @@ module.exports = {
   deleteTravelStory,
   updateFavoriteTravelStory,
   searchTravelStories,
+  filterTravelStoriesByDate,
 };

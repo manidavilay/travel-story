@@ -9,6 +9,7 @@ const handleImageUpload = async (req, res) => {
 
   try {
     const imageUrl = `http://localhost:8000/uploads/${req.file.filename}`;
+
     res.status(201).json({ imageUrl, message: "Image successfully uploaded" });
   } catch (error) {
     res.status(500).json({ message: "Server error. Please try again" });
