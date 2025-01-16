@@ -6,6 +6,7 @@ const {
   getAllStories,
   editTravelStory,
   deleteTravelStory,
+  updateFavoriteTravelStory,
 } = require("../controllers/travelStory.controller");
 
 // Add Travel Story Route
@@ -19,5 +20,12 @@ router.put("/edit/:id", authenticateToken, editTravelStory);
 
 // Delete Travel Story By Id Route
 router.delete("/delete/:id", authenticateToken, deleteTravelStory);
+
+// Travel Story Is Favorite By Id Route
+router.put(
+  "/update-favorite/:id",
+  authenticateToken,
+  updateFavoriteTravelStory
+);
 
 module.exports = router;

@@ -72,9 +72,10 @@ const editTravelStory = async (req, res) => {
     existingTravelStory.visitedDate = parsedVisitedDate;
 
     await existingTravelStory.save();
-    return res
-      .status(200)
-      .json({ message: "Travel story successfully updated !" });
+    return res.status(200).json({
+      story: existingTravelStory,
+      message: "Travel story successfully updated !",
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error. Please try again" });
   }
@@ -115,9 +116,37 @@ const deleteTravelStory = async (req, res) => {
   }
 };
 
+// Update Favorite Travel Story API
+const updateFavoriteTravelStory = async (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.user;
+  const { isFavorite } = req.body;
+
+  try {
+    const existingTravelStory = await TravelStory.findOne({
+      _id: id,
+      userId: userId,
+    });
+    if (!existingTravelStory) {
+      return res.status(404).json({ message: "Travel story not found" });
+    }
+
+    existingTravelStory.isFavorite = isFavorite;
+
+    await existingTravelStory.save();
+    res.status(200).json({
+      story: existingTravelStory,
+      message: "Travel story successfully updated !",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error. Please try again" });
+  }
+};
+
 module.exports = {
   addTravelStory,
   getAllStories,
   editTravelStory,
   deleteTravelStory,
+  updateFavoriteTravelStory,
 };
