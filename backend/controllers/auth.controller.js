@@ -6,11 +6,11 @@ const User = require("../models/user.model");
 const registerUser = async (req, res) => {
   const { fullName, email, password } = req.body;
 
-  try {
-    if (!fullName || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
+  if (!fullName || !email || !password) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
 
+  try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: "Email already exists" });
@@ -22,7 +22,9 @@ const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
     });
+
     await newUser.save();
+
     const accessToken = jwt.sign(
       { userId: newUser._id },
       process.env.ACCESS_TOKEN,
@@ -43,14 +45,17 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
   try {
-    if (!email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
     const existingUser = await User.findOne({ email });
+
     if (!existingUser) {
       return res.status(404).json({ message: "User not found" });
     }
+
     const isPasswordValid = bcrypt.compare(password, existingUser.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid credentials" });
