@@ -1,0 +1,13 @@
+.mainImage {
+  background-image: url("../../../assets/images/register.webp");
+  background-size: cover;
+  background-position: center;
+
+  .layover {
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0),
+      rgba(0, 0, 0, 0.5)
+    );
+  }
+}
