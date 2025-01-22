@@ -1,11 +1,15 @@
+import { useState } from "react";
 import classnames from "classnames";
 import Login from "../../components/Login/Login";
+import SignUp from "../../components/SignUp/SignUp";
 import styles from "./Auth.module.scss";
-import { useState } from "react";
-import Register from "../../components/Register/Register";
 
 const Auth = () => {
-  const [authType, setAuthType] = useState<"login" | "register">("login");
+  const [authType, setAuthType] = useState<"login" | "signup">("login");
+
+  const switchAuthType = () => {
+    setAuthType(authType === "login" ? "signup" : "login");
+  };
 
   return (
     <div className="relative flex justify-center items-center h-screen bg-indigo-100">
@@ -33,11 +37,18 @@ const Auth = () => {
         </div>
         <div className="flex items-center w-5/12 h-3/5 bg-white rounded-r-3xl">
           <div className="flex flex-col justify-center items-center w-10/12 mx-auto">
-            {authType === "login" ? (
-              <Login setAuthType={setAuthType} />
-            ) : (
-              <Register setAuthType={setAuthType} />
-            )}
+            <h2 className="mb-6 text-3xl font-semibold self-start">
+              {authType === "login" ? "Login" : "Create Account"}
+            </h2>
+            {authType === "login" ? <Login /> : <SignUp />}
+            <p className="my-4 text-center">Or</p>
+            <button
+              type="submit"
+              className="bg-indigo-100 text-indigo-900 w-full h-11 my-2 rounded-3xl font-bold text-base hover:bg-indigo-300"
+              onClick={switchAuthType}
+            >
+              {authType === "login" ? "CREATE ACCOUNT" : "LOGIN"}
+            </button>
           </div>
         </div>
       </div>

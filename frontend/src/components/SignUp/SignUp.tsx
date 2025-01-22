@@ -5,7 +5,8 @@ import * as yup from "yup";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 
-const loginSchema = yup.object({
+const signupSchema = yup.object({
+  fullName: yup.string().required("Full name is required"),
   email: yup
     .string()
     .email("Invalid email format")
@@ -16,13 +17,13 @@ const loginSchema = yup.object({
     .required("Password is required"),
 });
 
-const Login = () => {
+const SignUp = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(loginSchema),
+    resolver: yupResolver(signupSchema),
   });
   const [isPasswordShown, setIsPasswordShown] = useState<boolean>(false);
 
@@ -40,10 +41,17 @@ const Login = () => {
       className="flex flex-col w-full"
     >
       <input
+        type="text"
+        placeholder="Full Name"
+        {...register("fullName")}
+        className="w-full pl-5 py-3 mb-3 text-sm bg-slate-100 rounded"
+      />
+      <ErrorMessage error={errors.fullName} />
+      <input
         type="email"
         placeholder="Email"
         {...register("email")}
-        className="w-full pl-5 py-3 my-3 text-sm bg-slate-100 rounded"
+        className="w-full pl-5 py-3 mb-3 text-sm bg-slate-100 rounded"
       />
       <ErrorMessage error={errors.email} />
       <div className="flex items-center w-full bg-slate-100 px-5 rounded mb-3">
@@ -76,4 +84,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;
