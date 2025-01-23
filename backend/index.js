@@ -13,6 +13,7 @@ const DBStringConnection = process.env.MONGODB_URI;
 
 app.use(cors());
 app.use(express.json());
+app.use(cors({ origin: "*" }));
 
 // Auth API Routes
 app.use("/api/auth", authRoutes);
