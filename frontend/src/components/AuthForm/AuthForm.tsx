@@ -2,9 +2,10 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { AxiosError } from "axios";
 import axiosInstance from "../../utils/axiosIntance";
-import ErrorMessage from "../ErrorMessage/ErrorMessage";
-import PasswordInput from "../PasswordInput/PasswordInput";
+import InputField from "../InputField/InputField";
+import Button from "../Button/Button";
 
 const AuthForm = () => {
   const [authType, setAuthType] = useState<"login" | "register">("login");
@@ -21,17 +22,11 @@ const AuthForm = () => {
     password: yup.string().required("Password is required"),
   });
 
-  const switchAuthType = () => {
-    setAuthType((prev) => {
-      const newAuthType = prev === "login" ? "register" : "login";
-      accountRequired.current = newAuthType === "register";
-      return newAuthType;
-    });
-  };
-
   const {
     register,
     handleSubmit,
+    setError,
+    clearErrors,
     formState: { errors },
     getValues,
   } = useForm({
@@ -40,24 +35,42 @@ const AuthForm = () => {
 
   const BASE_URL = import.meta.env.VITE_API_URL;
 
+  const switchAuthType = () => {
+    setAuthType((prev) => {
+      const newAuthType = prev === "login" ? "register" : "login";
+      accountRequired.current = newAuthType === "register";
+      clearErrors();
+      return newAuthType;
+    });
+  };
+
   const onAuthFormSubmit = async () => {
     const { fullName, email, password } = getValues();
+
     try {
-      const response = await axiosInstance.post(
-        authType === "login"
-          ? `${BASE_URL}/auth/login`
-          : `${BASE_URL}/auth/register`,
-        {
-          fullName: fullName,
-          email: email,
-          password: password,
-        }
-      );
-      if (response.data && response.data.accessToken) {
+      const endpoint = authType === "login" ? "/auth/login" : "/auth/register";
+      const response = await axiosInstance.post(`${BASE_URL}${endpoint}`, {
+        fullName,
+        email,
+        password,
+      });
+
+      if (response.data?.accessToken) {
         localStorage.setItem("token", response.data.accessToken);
+        clearErrors();
+        console.log("Authentication successful!");
       }
     } catch (error) {
-      console.log(error);
+      if (error instanceof AxiosError) {
+        const errorMessage =
+          error.response?.data?.message || "An unknown server error occurred.";
+        setError("root", { type: "server", message: errorMessage });
+      } else {
+        setError("root", {
+          type: "server",
+          message: "An unexpected error occurred. Please try again.",
+        });
+      }
     }
   };
 
@@ -71,39 +84,39 @@ const AuthForm = () => {
         className="flex flex-col w-full"
       >
         {authType === "register" && (
-          <>
-            <input
-              type="text"
-              placeholder="Full Name"
-              {...register("fullName")}
-              className="w-full pl-5 py-3 mb-3 text-sm bg-slate-100 rounded"
-            />
-            <ErrorMessage error={errors.fullName} />
-          </>
+          <InputField
+            type="text"
+            placeholder="Full Name"
+            register={register}
+            field="fullName"
+            error={errors.fullName}
+          />
         )}
-        <input
+        <InputField
           type="email"
           placeholder="Email"
-          {...register("email")}
-          className="w-full pl-5 py-3 mb-3 text-sm bg-slate-100 rounded"
+          register={register}
+          field="email"
+          error={errors.email}
         />
-        <ErrorMessage error={errors.email} />
-        <PasswordInput register={register} />
-        <ErrorMessage error={errors.password} />
-        <button
-          type="submit"
-          className="bg-indigo-200 text-white w-full h-11 my-2 rounded-3xl font-bold text-base hover:bg-indigo-800"
-        >
-          VALIDATE
-        </button>
+        <InputField
+          type="password"
+          placeholder="Password"
+          register={register}
+          field="password"
+          error={errors.password}
+        />
+        {errors.root && (
+          <p className="mb-3 text-red-500 text-sm">{errors.root?.message}</p>
+        )}
+        <Button type="submit" variant="primary" label="VALIDATE" />
       </form>
-      <button
-        type="submit"
-        className="bg-indigo-100 text-indigo-900 w-full h-11 my-2 rounded-3xl font-bold text-base hover:bg-indigo-300"
-        onClick={switchAuthType}
-      >
-        {authType === "login" ? "CREATE ACCOUNT" : "LOGIN"}
-      </button>
+      <Button
+        type="button"
+        variant="secondary"
+        label={authType === "login" ? "CREATE ACCOUNT" : "LOGIN"}
+        handleFunction={switchAuthType}
+      />
     </>
   );
 };
