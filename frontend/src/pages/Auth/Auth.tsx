@@ -37,8 +37,6 @@ const Auth = () => {
     resolver: yupResolver(schema),
   });
 
-  const BASE_URL = import.meta.env.VITE_API_URL;
-
   const switchAuthType = () => {
     setAuthType((prev) => {
       const newAuthType = prev === "login" ? "register" : "login";
@@ -53,7 +51,7 @@ const Auth = () => {
 
     try {
       const endpoint = authType === "login" ? "/auth/login" : "/auth/register";
-      const response = await axiosInstance.post(`${BASE_URL}${endpoint}`, {
+      const response = await axiosInstance.post(`${endpoint}`, {
         fullName,
         email,
         password,
