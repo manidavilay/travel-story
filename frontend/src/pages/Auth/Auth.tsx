@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 import classnames from "classnames";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -11,6 +12,7 @@ import styles from "./Auth.module.scss";
 
 const Auth = () => {
   const [authType, setAuthType] = useState<"login" | "register">("login");
+  const navigate = useNavigate();
 
   const accountRequired = useRef(false);
   const schema = yup.object().shape({
@@ -60,7 +62,7 @@ const Auth = () => {
       if (response.data?.accessToken) {
         localStorage.setItem("token", response.data.accessToken);
         clearErrors();
-        console.log("Authentication successful!");
+        navigate("/dashboard");
       }
     } catch (error) {
       if (error instanceof AxiosError) {
